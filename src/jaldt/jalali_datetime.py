@@ -51,3 +51,9 @@ class StrfTimeFormat(str, Enum):
 class Language(str, Enum):
     farsi = 'farsi'
     fingilish = 'fingilish'
+
+
+class CalendarStyle(str, Enum):
+    highlight = 'highlight'
+    underline = 'underline'
+    blink = 'blink'
