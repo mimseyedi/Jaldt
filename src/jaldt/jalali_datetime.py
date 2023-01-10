@@ -69,3 +69,19 @@ class CalendarColor(str, Enum):
     yellow = 'yellow'
     pink = 'pink'
     gray = 'gray'
+
+
+class JalaliStringMonth(str, Enum):
+    now = 'now'
+    farvardin = 'farvardin'
+    ordibehesht = 'ordibehesht'
+    khordad = 'khordad'
+    tir = 'tir'
+    mordad = 'mordad'
+    shahrivar = 'shahrivar'
+    mehr = 'mehr'
+    aban = 'aban'
+    azar = 'azar'
+    dey = 'dey'
+    bahman = 'bahman'
+    esfand = 'esfand'
