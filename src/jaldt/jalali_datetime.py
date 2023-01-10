@@ -46,3 +46,8 @@ class StrfTimeFormat(str, Enum):
     minute_with_zero = '%M'
     second = '%-S'
     second_with_zero = '%S'
+
+
+class Language(str, Enum):
+    farsi = 'farsi'
+    fingilish = 'fingilish'
