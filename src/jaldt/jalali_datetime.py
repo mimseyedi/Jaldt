@@ -57,3 +57,15 @@ class CalendarStyle(str, Enum):
     highlight = 'highlight'
     underline = 'underline'
     blink = 'blink'
+
+
+class CalendarColor(str, Enum):
+    default = 'def'
+    black = 'black'
+    red = 'red'
+    blue = 'blue'
+    cyan = 'cyan'
+    green = 'green'
+    yellow = 'yellow'
+    pink = 'pink'
+    gray = 'gray'
