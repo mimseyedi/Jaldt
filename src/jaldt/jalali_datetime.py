@@ -199,3 +199,156 @@ def j2g(jy: int, jm: int, jd: int) -> List[int]:
 
     return [gy, gm, gd]
 
+
+def now(strftime: StrfTimeFormat='default', lang: Language='farsi') -> str:
+    """
+    Returns the current date and time in Jalali.
+
+    :param strftime: The strftime format for the return value
+    :param lang: The language of the return value ('farsi', 'fingilish')
+    :return: str
+    """
+
+    if lang not in set(Language):
+        raise TypeError(f'Only {[language.value for language in Language]} are allowed.')
+
+    farsi_numbers = {'0': '۰', '1': '۱', '2': '۲', '3': '۳', '4': '۴',
+                     '5': '۵', '6': '۶', '7': '۷', '8': '۸', '9': '۹'}
+
+    farsi_weekday = {'Monday': 'دوشنبه', 'Tuesday': 'سه شنبه', 'Wednesday': 'چهارشنبه',
+                     'Thursday': 'پنجشنبه', 'Friday': 'جمعه', 'Saturday': 'شنبه', 'Sunday': 'یکشنبه'}
+
+    fingilish_weekday = {'Monday': '2shanbe', 'Tuesday': '3shanbe', 'Wednesday': '4shanbe',
+                         'Thursday': '5shanbe', 'Friday': 'jomeh', 'Saturday': 'shanbe', 'Sunday': '1shanbe'}
+
+    jalali_farsi_months = {1: 'فروردین', 2: 'اردیبهشت', 3: 'خرداد',
+                           4: 'تیر', 5: 'مرداد', 6: 'شهریور',
+                           7: 'مهر', 8: 'آبان', 9: 'آذر',
+                           10: 'دی', 11: 'بهمن', 12: 'اسفند'}
+
+    jalali_fingilish_months = {1: 'farvardin', 2: 'ordibehesht', 3: 'khordad',
+                               4: 'tir', 5: 'mordad', 6: 'shahrivar',
+                               7: 'mehr', 8: 'aban', 9: 'azar',
+                               10: 'dey', 11: 'bahman', 12: 'esfand'}
+
+    current_datetime = datetime.now()
+
+    jalali_date = g2j(current_datetime.year,
+                      current_datetime.month,
+                      current_datetime.day)
+
+    def convert_numbers(string_of_numbers: str) -> str:
+        string_with_farsi_numbers = ''
+        for char in string_of_numbers:
+            if char.isdigit():
+                string_with_farsi_numbers += farsi_numbers[char]
+            else:
+                string_with_farsi_numbers += char
+
+        return string_with_farsi_numbers
+
+
+    add_zero = lambda number: f'0{str(number)}' if number < 10 else str(number)
+
+    if strftime == 'default':
+        jalali_date = '/'.join(list(map(str, g2j(current_datetime.year,
+                                                 current_datetime.month,
+                                                 current_datetime.day))))
+        if lang == 'farsi':
+            return convert_numbers(jalali_date) + ' ' + convert_numbers(str(current_datetime.time()))
+        else:
+            return jalali_date + ' ' + str(current_datetime.time())
+
+    else:
+        output, index = '', 0
+
+        while index < len(strftime):
+            if strftime[index] == '%' and index != len(strftime) - 1:
+
+                if strftime[index + 1] != '-':
+                    symbol = strftime[index] + strftime[index + 1]
+                else:
+                    symbol = f'{strftime[index]}{strftime[index + 1]}{strftime[index + 2]}'
+
+                if symbol in set(StrfTimeFormat):
+                    if symbol == '%a':
+                        weekday = current_datetime.strftime('%A')
+                        output += farsi_weekday[weekday][:3] if lang == 'farsi' else fingilish_weekday[weekday][:3]
+
+                    elif symbol == '%A':
+                        weekday = current_datetime.strftime('%A')
+                        output += farsi_weekday[weekday] if lang == 'farsi' else fingilish_weekday[weekday]
+
+                    elif symbol == '%-d':
+                        output += convert_numbers(str(jalali_date[2])) if lang == 'farsi' else str(jalali_date[2])
+
+                    elif symbol == '%d':
+                        output += convert_numbers(add_zero(jalali_date[2])) if lang == 'farsi' else add_zero(jalali_date[2])
+
+                    elif symbol == '%b':
+                        output += jalali_farsi_months[jalali_date[1]][:3] if lang == 'farsi' else jalali_fingilish_months[jalali_date[1]][:3]
+
+                    elif symbol == '%B':
+                        output += jalali_farsi_months[jalali_date[1]] if lang == 'farsi' else jalali_fingilish_months[jalali_date[1]]
+
+                    elif symbol == '%-m':
+                        output += convert_numbers(str(jalali_date[1])) if lang == 'farsi' else str(jalali_date[1])
+
+                    elif symbol == '%m':
+                        output += convert_numbers(add_zero(jalali_date[1])) if lang == 'farsi' else add_zero(jalali_date[1])
+
+                    elif symbol == '%Y':
+                        output += convert_numbers(str(jalali_date[0])) if lang == 'farsi' else str(jalali_date[0])
+
+                    elif symbol == '%y':
+                        output += convert_numbers(str(jalali_date[0]))[-2:] if lang == 'farsi' else str(jalali_date[0])[-2:]
+
+                    elif symbol == '%-H':
+                        output += convert_numbers(str(current_datetime.strftime('%-H'))) if lang == 'farsi' else \
+                            str(current_datetime.strftime('%-H'))
+
+                    elif symbol == '%H':
+                        output += convert_numbers(
+                            str(current_datetime.strftime('%H'))) if lang == 'farsi' else \
+                            str(current_datetime.strftime('%H'))
+
+                    elif symbol == '%-I':
+                        output += convert_numbers(str(current_datetime.strftime('%-I'))) if lang == 'farsi' else \
+                            str(current_datetime.strftime('%-I'))
+
+                    elif symbol == '%I':
+                        output += convert_numbers(
+                            str(current_datetime.strftime('%I'))) if lang == 'farsi' else str(current_datetime.strftime('%I'))
+
+                    elif symbol == '%p':
+                        am_or_pm = str(current_datetime.strftime('%p'))
+                        if lang == 'farsi':
+                            output += 'صبح' if am_or_pm == 'AM' else 'بعد از ظهر'
+                        else:
+                            output += am_or_pm
+
+                    elif symbol == '%-M':
+                        output += convert_numbers(str(current_datetime.strftime('%-M'))) if lang == 'farsi' else str(
+                            current_datetime.strftime('%-M'))
+
+                    elif symbol == '%M':
+                        output += convert_numbers(str(current_datetime.strftime('%M'))) if lang == 'farsi' else str(
+                            current_datetime.strftime('%M'))
+
+                    elif symbol == '%-S':
+                        output += convert_numbers(str(current_datetime.strftime('%-S'))) if lang == 'farsi' else str(
+                            current_datetime.strftime('%-S'))
+
+                    elif symbol == '%S':
+                        output += convert_numbers(str(current_datetime.strftime('%S'))) if lang == 'farsi' else str(
+                            current_datetime.strftime('%S'))
+
+                else:
+                    raise TypeError(f'Only {[strf.value for strf in StrfTimeFormat]} are allowed.')
+
+                index += 2 if len(symbol) == 2 else 3
+            else:
+                output += strftime[index]
+                index += 1
+
+        return output
