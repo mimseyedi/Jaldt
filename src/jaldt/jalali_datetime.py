@@ -352,3 +352,170 @@ def now(strftime: StrfTimeFormat='default', lang: Language='farsi') -> str:
                 index += 1
 
         return output
+
+
+def calendar(month: JalaliStringMonth='now', lang: Language='farsi',
+             color: CalendarColor='def', style: CalendarStyle='highlight') -> None:
+    """
+    Jalali calendar is printed by this function.
+
+    :param month: Jalali month in lower string format
+    :param lang: Jalali calendar language ('farsi', 'fingilish')
+    :param color: Jalali calendar color
+    :param style: Current day display style
+    :return: None
+    """
+
+    if month not in set(JalaliStringMonth):
+        raise TypeError(f'Only {[jalali_month.value for jalali_month in JalaliStringMonth]} are allowed')
+
+    if lang not in set(Language):
+        raise TypeError(f'Only {[language.value for language in Language]} are allowed.')
+
+    if color not in set(CalendarColor):
+        raise TypeError(f'Only {[calcolor.value for calcolor in CalendarColor]} are allowed.')
+
+    if style not in set(CalendarStyle):
+        raise TypeError(f'Only {[calstyle.value for calstyle in CalendarStyle]} are allowed.')
+
+
+    ansi_colors = {"def": "\033[0m", "gray": "\033[90m", "red": "\033[91m",
+                   "blue": '\x1b[94m', "green": "\033[92m", "yellow": "\033[93m",
+                   "pink": "\033[95m", 'cyan': '\x1b[36m', 'black': '\x1b[30m'}
+
+    ansi_styles = {"highlight": "\033[100m", "underline": "\033[4m", "blink": "\033[5m"}
+
+    jalali_months = ['farvardin', 'ordibehesht', 'khordad',
+                     'tir', 'mordad', 'shahrivar',
+                     'mehr', 'aban', 'azar',
+                     'dey', 'bahman', 'esfand']
+
+    jalali_months_farsi = ['فروردین', 'اردیبهشت', 'خرداد',
+                           'تیر', 'مرداد', 'شهریور',
+                           'مهر', 'آبان', 'آذر',
+                           'دی', 'بهمن', 'اسفند']
+
+    farsi_numbers = {'0': ' ۰', '1': ' ۱', '2': ' ۲', '3': ' ۳', '4': ' ۴',
+                     '5': ' ۵', '6': ' ۶', '7': ' ۷', '8': ' ۸', '9': ' ۹',
+                     '10': '۱۰', '11': '۱۱', '12': '۱۲', '13': '۱۳', '14': '۱۴',
+                     '15': '۱۵', '16': '۱۶', '17': '۱۷', '18': '۱۸', '19': '۱۹',
+                     '20': '۲۰', '21': '۲۱', '22': '۲۲', '23': '۲۳', '24': '۲۴',
+                     '25': '۲۵', '26': '۲۶', '27': '۲۷', '28': '۲۸', '29': '۲۹',
+                     '30': '۳۰', '31': '۳۱'}
+
+    jalali_days_farsi = ['۲ش', '۳ش', '۴ش', '۵ش', 'جم', 'شن', '۱ش']
+    days_after_current_day_farsi = {'۲ش': 5, '۳ش': 4, '۴ش': 3, '۵ش': 2, 'جم': 1, 'شن': 7, '۱ش': 6}
+
+    jalali_days = ['2s', '3s', '4s', '5s', 'jo', 'sh', '1s']
+    days_after_current_day = {'2s': 5, '3s': 4, '4s': 3, '5s': 2, 'jo': 1, 'sh': 7, '1s': 6}
+
+    days_space_to_print_first_day = {'2s': 14, '3s': 11, '4s': 8, '5s': 5, 'jo': 2, 'sh': 20, '1s': 17}
+
+    g_year, g_month, g_day = datetime.now().year, datetime.now().month, datetime.now().day
+    j_year, j_month, j_day = g2j(g_year, g_month, g_day)
+
+    is_leap_year = lambda jalali_year: True if (jalali_year - 1399) % 4 == 0 else False
+
+    current_year = j_year
+
+    if month == 'now':
+        current_month = jalali_months[j_month - 1]
+        first_day_of_month_in_g = j2g(j_year, j_month, 1)
+    else:
+        current_month = month
+        first_day_of_month_in_g = j2g(current_year, jalali_months.index(month) + 1, 1)
+
+    month_days = 31 if current_month in jalali_months[:6] else (
+        30 if current_month in jalali_months[6:11] else (30 if is_leap_year(current_year) else 29))
+
+    current_date = 1
+
+    if lang == 'farsi':
+        farsi_year = ''.join([farsi_numbers[number] for number in str(current_year)]).replace(" ", '')
+        month_title = f'{ansi_colors[color]}{farsi_year} {jalali_months_farsi[jalali_months.index(current_month)]}'
+        month_title_space = ((20 // 2) + len(month_title) // 2) - len(month_title) + 3
+
+        j_weekday = jalali_days_farsi[datetime(first_day_of_month_in_g[0],
+                                               first_day_of_month_in_g[1],
+                                               first_day_of_month_in_g[2]).weekday()]
+
+        first_day_to_print = days_after_current_day_farsi[j_weekday]
+        last_line_space = {0: 18, 1: 5, 2: 8, 3: 11, 4: 14, 5: 17, 6: 20}
+
+        print(" " * month_title_space + month_title)
+        for _ in range(20):
+            print("—", end='')
+
+        print('\n' + 'شن ۱ش ۲ش ۳ش ۴ش ۵ش جم')
+
+        for i in range(first_day_to_print, current_date - 1, -1):
+            print(f'{farsi_numbers[str(i)]}', end=' ')
+            current_date += 1
+        print()
+
+        while current_date <= month_days:
+            c = 6
+            if current_date + 6 > month_days:
+                c = c - ((current_date + 6) - month_days)
+            for i in range(current_date + c, current_date - 1, -1):
+                if current_date > month_days:
+                    break
+                if i == month_days:
+                    if i != current_date:
+                        space = 20 - last_line_space[i - current_date]
+                        if i == j_day and jalali_months.index(current_month) + 1 == j_month:
+                            print(f"{ansi_styles[style]}{farsi_numbers[str(i)]}\033[0m", end=' ')
+                        else:
+                            print(" " * space + f"{ansi_colors[color]}{farsi_numbers[str(i)]}", end=' ')
+                    else:
+                        if i == j_day and jalali_months.index(current_month) + 1 == j_month:
+                            print(f"{ansi_styles[style]}{farsi_numbers[str(i)]}\033[0m", end=' ')
+                        else:
+                            print(" " * 18 + f"{ansi_colors[color]}{farsi_numbers[str(i)]}", end=' ')
+                else:
+                    if i == j_day and jalali_months.index(current_month) + 1 == j_month:
+                        print(f"{ansi_styles[style]}{farsi_numbers[str(i)]}\033[0m", end=' ')
+                    else:
+                        print(f"{ansi_colors[color]}{farsi_numbers[str(i)]}", end=' ')
+                current_date += 1
+            print("\033[0m")
+
+    else:
+        month_title = f'{ansi_colors[color]}{current_month.capitalize()} {current_year}'
+        month_title_space = ((20 // 2) + len(month_title) // 2) - len(month_title) + 3
+
+        j_weekday = jalali_days[datetime(first_day_of_month_in_g[0],
+                                         first_day_of_month_in_g[1],
+                                         first_day_of_month_in_g[2]).weekday()]
+
+        space_to_print_first_day = 20 - days_space_to_print_first_day[j_weekday]
+
+        print(" " * month_title_space + month_title)
+        for _ in range(20):
+            print("—", end='')
+
+        print('\n' + 'sh 1s 2s 3s 4s 5s jo')
+
+        print(" " * space_to_print_first_day, end='')
+
+        for date in range(current_date, days_after_current_day[j_weekday] + 1):
+            print(f' {current_date}', end=' ')
+            current_date += 1
+        print()
+
+        while current_date <= month_days:
+            for _ in range(7):
+                if current_date > month_days:
+                    break
+                if current_date < 10:
+                    if current_date == j_day and jalali_months.index(current_month) + 1 == j_month:
+                        print(f" {ansi_styles[style]}{current_date}\033[0m", end=' ')
+                    else:
+                        print(f" {ansi_colors[color]}{current_date}", end=' ')
+                else:
+                    if current_date == j_day and jalali_months.index(current_month) + 1 == j_month:
+                        print(f"{ansi_styles[style]}{current_date}\033[0m", end=' ')
+                    else:
+                        print(f"{ansi_colors[color]}{current_date}", end=' ')
+                current_date += 1
+            print("\033[0m")
