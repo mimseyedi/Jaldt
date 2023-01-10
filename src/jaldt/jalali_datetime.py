@@ -85,3 +85,19 @@ class JalaliStringMonth(str, Enum):
     dey = 'dey'
     bahman = 'bahman'
     esfand = 'esfand'
+
+
+class JalaliIntegerMonth(int, Enum):
+    now = 0
+    farvardin = 1
+    ordibehesht = 2
+    khordad = 3
+    tir = 4
+    mordad = 5
+    shahrivar = 6
+    mehr = 7
+    aban = 8
+    azar = 9
+    dey = 10
+    bahman = 11
+    esfand = 12
