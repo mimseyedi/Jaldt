@@ -24,3 +24,25 @@ __all__ = [
     "events",
 ]
 
+
+class StrfTimeFormat(str, Enum):
+    default = 'default'
+    short_weekday_name = "%a"
+    full_weekday_name = "%A"
+    day_of_month = '%-d'
+    day_of_month_with_zero = '%d'
+    short_month_name = '%b'
+    full_month_name = '%B'
+    month = '%-m'
+    month_with_zero = '%m'
+    year = '%Y'
+    year_without_century_with_zero = '%y'
+    hour_24 = '%-H'
+    hour_24_with_zero = '%H'
+    hour_12 = '%-I'
+    hour_12_with_zero = '%I'
+    am_or_pm = '%p'
+    minute = '%-M'
+    minute_with_zero = '%M'
+    second = '%-S'
+    second_with_zero = '%S'
