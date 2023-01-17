@@ -1,7 +1,5 @@
 # Jaldt
 
-[![pypi](https://img.shields.io/pypi/v/jaldt.svg)](https://google.com) [![license](https://img.shields.io/github/license/mimseyedi/jaldt.svg)](https://github.com/mimseyedi/Jaldt/blob/master/LICENSE)
-
 ![img1](https://raw.githubusercontent.com/mimseyedi/Jaldt/master/docs/images/jaldt_poster.png)
 
 `Jaldt` is a package for working with date and time based on Jalali calendar and date.
